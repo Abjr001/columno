@@ -7,9 +7,16 @@ const nextConfig: NextConfig = {
       {
         source: "/",
         destination: "/landing",
-        permanent: false, 
+        permanent: false,
       },
     ];
+  },
+  images: {
+    remotePatterns: [
+      new URL(
+        "https://unsplash.com/fr/photos/embleme-mercedes-benz-argente-sur-surface-bleue-5MlBMYDsGBY",
+      ),
+    ],
   },
 };
 

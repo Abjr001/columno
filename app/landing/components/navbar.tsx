@@ -13,8 +13,12 @@ function Navbar() {
           {/* <span className="block text-xl">olumno</span> */}
         </li>
         <span className="flex">
-          <NavbarItem href="/demo">Try the app</NavbarItem>
-          <NavbarItem href="/contact">Contact Developer</NavbarItem>
+          <div className="flex rounded-lg">
+            {/* <NavbarItem href="/demo" className="rounded-l-lg">Try the app</NavbarItem> */}
+            <NavbarItem href="/contact" className="rounded-r-lg">
+              Contact Developer
+            </NavbarItem>
+          </div>
           <TryItOut className="ml-3" />
         </span>
       </ul>
