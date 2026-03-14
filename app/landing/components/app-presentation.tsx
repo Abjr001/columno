@@ -4,7 +4,10 @@ import EnterprisesImage from "./enterprises-img";
 
 function AppPresentation() {
   return (
-    <div className="flex flex-col items-center pt-16 xl:flex-row xl:justify-around xl:pt-0">
+    <div className="flex flex-col items-center sm:pt-16 xl:flex-row xl:justify-around xl:pt-0">
+      <div className="w-full flex justify-center sm:hidden xl:w-1/2">
+        <OrbitalTools />
+      </div>
       <div className="w-full text-center flex flex-col gap-14 justify-around md:w-3xl lg:w-xl xl:w-1/2 xl:text-left">
         <div className="h-full flex flex-col gap-4">
           <div className="text-xl md:text-3xl lg:text-5xl">
@@ -33,7 +36,7 @@ function AppPresentation() {
           </p>
         </div>
       </div>
-      <div className="w-full flex justify-center xl:w-1/2">
+      <div className="w-full hidden sm:flex sm:justify-center xl:w-1/2">
         <OrbitalTools />
       </div>
     </div>
