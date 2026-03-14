@@ -8,13 +8,16 @@ function Navbar() {
   return (
     <nav>
       <ul className="flex justify-between items-center text-white">
-        <li className="">
+        <li className="max-sm:h-16 max-sm:w-30">
           <Image height={200} width={150} src={Columno} alt="logo" />{" "}
         </li>
         <li className="flex">
           <div className="flex rounded-lg">
             {/* <NavbarItem href="/demo" className="rounded-l-lg">Try the app</NavbarItem> */}
-            <NavbarItem href="/contact" className="rounded-r-lg">
+            <NavbarItem
+              href="/contact"
+              className="rounded-lg"
+            >
               Contact <span className="max-sm:hidden">Développeur</span>
             </NavbarItem>
           </div>
