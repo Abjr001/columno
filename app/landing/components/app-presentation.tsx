@@ -5,7 +5,7 @@ import EnterprisesImage from "./enterprises-img";
 function AppPresentation() {
   return (
     <div className="flex flex-col items-center sm:pt-16 xl:flex-row xl:justify-around xl:pt-0">
-      <div className="w-full mb-10 flex justify-center sm:hidden xl:w-1/2">
+      <div className="w-full my-10 flex justify-center sm:hidden xl:w-1/2">
         <OrbitalTools />
       </div>
       <div className="w-full text-center flex flex-col gap-14 justify-around md:w-3xl lg:w-xl xl:w-1/2 xl:text-left">
