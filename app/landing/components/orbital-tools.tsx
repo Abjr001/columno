@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
 import ColumnoC from "@/public/columno-w-bg.png";
@@ -8,25 +8,20 @@ import ColumnoC from "@/public/columno-w-bg.png";
 // ── Data ──────────────────────────────────────────────────────────────────────
 
 const tools = [
-  { icon: "📋", label: "Tasks", desc: "Gérez vos tâches" },
-  { icon: "📊", label: "Analytics", desc: "Analysez vos données" },
-  { icon: "📅", label: "Calendar", desc: "Planifiez votre temps" },
-  { icon: "👥", label: "Team", desc: "Collaborez ensemble" },
-  { icon: "🎯", label: "Goals", desc: "Atteignez vos cibles" },
+  { icon: "📋", label: "Tâches", desc: "Gérez vos tâches" },
+  { icon: "📊", label: "Analyses", desc: "Analysez vos données" },
+  { icon: "📅", label: "Plannification", desc: "Planifiez votre temps" },
+  { icon: "👥", label: "Equipes", desc: "Collaborez ensemble" },
+  { icon: "🎯", label: "Objectifs", desc: "Atteignez vos cibles" },
   { icon: "⚡", label: "Sprints", desc: "Accélérez la cadence" },
 ];
 
 // ── Hex geometry ──────────────────────────────────────────────────────────────
-const VB = 500;
-const C = VB / 2;
-const R = 195;
 
-function hexPoint(index: number) {
+function hexPoint(index: number, C: number, R: number) {
   const angle = (Math.PI / 3) * index - Math.PI / 6;
   return { x: C + R * Math.cos(angle), y: C + R * Math.sin(angle) };
 }
-
-const points = tools.map((_, i) => hexPoint(i));
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
@@ -35,11 +30,13 @@ function ConnectorLine({
   y,
   active,
   index,
+  C,
 }: {
   x: number;
   y: number;
   active: boolean;
   index: number;
+  C: number;
 }) {
   return (
     <motion.line
@@ -57,7 +54,17 @@ function ConnectorLine({
   );
 }
 
-function PulseDot({ x, y, index }: { x: number; y: number; index: number }) {
+function PulseDot({
+  x,
+  y,
+  index,
+  C,
+}: {
+  x: number;
+  y: number;
+  index: number;
+  C: number;
+}) {
   return (
     <motion.circle
       r={3.5}
@@ -166,116 +173,122 @@ function ToolNode({
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 export const OrbitalTools = () => {
+  const [vb, setVb] = useState(500);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    const update = () => setVb(window.innerWidth >= 480 ? 600 : 500);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  const C = vb / 2;
+  const R = 195;
+  const points = tools.map((_, i) => hexPoint(i, C, R));
   const activeTool = activeIndex !== null ? tools[activeIndex] : null;
 
   return (
-    <div className="flex flex-col items-center gap-6 select-none w-full max-w-2xl mx-auto px-4">
-      <div className="w-full max-w-lg mx-auto xl:max-w-2xl aspect-square">
-        <svg
-          viewBox={`0 0 ${VB} ${VB}`}
-          width="100%"
-          height="100%"
-          preserveAspectRatio="xMidYMid meet"
-          style={{ display: "block" }}
-        >
-          <defs>
-            <radialGradient id="centreGlow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#d1fae5" stopOpacity="0.8" />
-              <stop offset="100%" stopColor="#d1fae5" stopOpacity="0" />
-            </radialGradient>
-          </defs>
+    <div className="select-none w-full max-w-lg mx-auto sm:max-w-2xl aspect-square">
+      <svg
+        viewBox={`0 0 ${vb} ${vb}`}
+        width="100%"
+        height="100%"
+        style={{ display: "block" }}
+      >
+        <defs>
+          <radialGradient id="centreGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#d1fae5" stopOpacity="0.8" />
+            <stop offset="100%" stopColor="#d1fae5" stopOpacity="0" />
+          </radialGradient>
+        </defs>
 
-          {/* Background glow */}
-          <circle cx={C} cy={C} r={220} fill="url(#centreGlow)" />
+        {/* Background glow */}
+        <circle cx={C} cy={C} r={220} fill="url(#centreGlow)" />
 
-          {/* Hex outline */}
-          <polygon
-            points={points.map((p) => `${p.x},${p.y}`).join(" ")}
-            fill="none"
-            stroke="#bbf7d0"
-            strokeWidth={1}
-            strokeDasharray="5 8"
+        {/* Hex outline */}
+        <polygon
+          points={points.map((p) => `${p.x},${p.y}`).join(" ")}
+          fill="none"
+          stroke="#bbf7d0"
+          strokeWidth={1}
+          strokeDasharray="5 8"
+        />
+
+        {/* Connectors */}
+        {points.map((p, i) => (
+          <ConnectorLine
+            key={i}
+            x={p.x}
+            y={p.y}
+            active={activeIndex === i}
+            index={i}
+            C={C}
           />
+        ))}
 
-          {/* Connectors */}
-          {points.map((p, i) => (
-            <ConnectorLine
-              key={i}
-              x={p.x}
-              y={p.y}
-              active={activeIndex === i}
-              index={i}
-            />
-          ))}
+        {/* Pulse dots */}
+        {points.map((p, i) => (
+          <PulseDot key={i} x={p.x} y={p.y} index={i} C={C} />
+        ))}
 
-          {/* Pulse dots */}
-          {points.map((p, i) => (
-            <PulseDot key={i} x={p.x} y={p.y} index={i} />
-          ))}
+        {/* Tool nodes */}
+        {tools.map((tool, i) => (
+          <ToolNode
+            key={tool.label}
+            tool={tool}
+            point={points[i]}
+            index={i}
+            active={activeIndex === i}
+            onHover={setActiveIndex}
+          />
+        ))}
 
-          {/* Tool nodes */}
-          {tools.map((tool, i) => (
-            <ToolNode
-              key={tool.label}
-              tool={tool}
-              point={points[i]}
-              index={i}
-              active={activeIndex === i}
-              onHover={setActiveIndex}
-            />
-          ))}
-
-          {/* Centre — logo ou tooltip selon survol */}
-          <foreignObject x={C - 52} y={C - 52} width={104} height={104}>
-            <AnimatePresence mode="wait">
-              {activeTool ? (
-                /* ── Tooltip centré ── */
-                <motion.div
-                  key={activeTool.label}
-                  initial={{ scale: 0.7, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.7, opacity: 0 }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 380,
-                    damping: 22,
-                    duration: 0.18,
-                  }}
-                  className="w-full h-full rounded-full bg-emerald-50 border border-emerald-200 shadow-[0_6px_32px_rgba(52,211,153,0.30)] flex flex-col items-center justify-center overflow-hidden gap-0.5 px-1"
-                >
-                  <span className="text-2xl leading-none">
-                    {activeTool.icon}
-                  </span>
-                  <p className="text-[10px] font-bold text-emerald-700 leading-tight text-center uppercase tracking-wide mt-0.5">
-                    {activeTool.label}
-                  </p>
-                  <p className="text-[8.5px] text-emerald-500 leading-tight text-center px-1">
-                    {activeTool.desc}
-                  </p>
-                </motion.div>
-              ) : (
-                /* ── Logo par défaut ── */
-                <motion.div
-                  key="logo"
-                  initial={{ scale: 0.7, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.7, opacity: 0 }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 380,
-                    damping: 22,
-                    duration: 0.18,
-                  }}
-                  className="w-full h-full rounded-full bg-white border border-emerald-100 shadow-[0_6px_32px_rgba(52,211,153,0.22)] flex items-center justify-center overflow-hidden"
-                >
-                  <Image src={ColumnoC} height={80} width={80} alt="logo" />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </foreignObject>
-        </svg>
-      </div>
+        {/* Centre — logo ou tooltip selon survol */}
+        <foreignObject x={C - 52} y={C - 52} width={104} height={104}>
+          <AnimatePresence mode="wait">
+            {activeTool ? (
+              <motion.div
+                key={activeTool.label}
+                initial={{ scale: 0.7, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.7, opacity: 0 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 380,
+                  damping: 22,
+                  duration: 0.18,
+                }}
+                className="w-full h-full rounded-full bg-emerald-50 border border-emerald-200 shadow-[0_6px_32px_rgba(52,211,153,0.30)] flex flex-col items-center justify-center overflow-hidden gap-0.5 px-1"
+              >
+                <span className="text-2xl leading-none">{activeTool.icon}</span>
+                <p className="text-[10px] font-bold text-emerald-700 leading-tight text-center uppercase tracking-wide mt-0.5">
+                  {activeTool.label}
+                </p>
+                <p className="text-[8.5px] text-emerald-500 leading-tight text-center px-1">
+                  {activeTool.desc}
+                </p>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="logo"
+                initial={{ scale: 0.7, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.7, opacity: 0 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 380,
+                  damping: 22,
+                  duration: 0.18,
+                }}
+                className="w-full h-full rounded-full bg-white border border-emerald-100 shadow-[0_6px_32px_rgba(52,211,153,0.22)] flex items-center justify-center overflow-hidden"
+              >
+                <Image src={ColumnoC} height={80} width={80} alt="logo" />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </foreignObject>
+      </svg>
     </div>
   );
 };
