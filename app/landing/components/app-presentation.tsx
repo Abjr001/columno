@@ -5,7 +5,7 @@ import EnterprisesImage from "./enterprises-img";
 function AppPresentation() {
   return (
     <div className="flex flex-col items-center sm:pt-16 xl:flex-row xl:justify-around xl:pt-0">
-      <div className="w-full flex justify-center sm:hidden xl:w-1/2">
+      <div className="w-full mb-10 flex justify-center sm:hidden xl:w-1/2">
         <OrbitalTools />
       </div>
       <div className="w-full text-center flex flex-col gap-14 justify-around md:w-3xl lg:w-xl xl:w-1/2 xl:text-left">
@@ -14,7 +14,7 @@ function AppPresentation() {
             Transformer vos idées en projet. Suivez les progrès. Livrez plus
             rapidement 🚀
           </div>
-          <p className="w-2/3 mx-auto text-white/60 xl:w-1/2 xl:mx-0">
+          <p className="w-full md:w-2/3 mx-auto text-white/60 xl:w-1/2 xl:mx-0">
             Notre platforme mets à votre disposition des fonctionnalités et
             outils vous permettant de suivre toutes les étapes et tâche
             spéficique de la conception à l&apos;implémentation

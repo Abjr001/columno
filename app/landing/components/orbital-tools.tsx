@@ -17,7 +17,7 @@ const tools = [
 ];
 
 // ── Hex geometry ──────────────────────────────────────────────────────────────
-const VB = 660;
+const VB = 500;
 const C = VB / 2;
 const R = 195;
 
