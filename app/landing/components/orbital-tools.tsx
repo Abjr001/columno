@@ -16,7 +16,7 @@ const tools = [
   { icon: "⚡", label: "Sprints", desc: "Accélérez la cadence" },
 ];
 
-// ── Hex geometry ──────────────────────────────────────────────────────────────
+// ── Hex geometry ───────────────────────────────────────────────────────────
 
 function hexPoint(index: number, C: number, R: number) {
   const angle = (Math.PI / 3) * index - Math.PI / 6;
