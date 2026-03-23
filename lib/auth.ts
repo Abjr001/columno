@@ -7,11 +7,25 @@ import { prisma } from "./prisma";
 import bcrypt from "bcryptjs";
 import type { Adapter } from "next-auth/adapters";
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(prisma) as Adapter,
+const adapter = PrismaAdapter(prisma);
 
-  // Credentials nécessite strategy "jwt" car l'adapter database
-  // ne fonctionne pas avec les credentials par défaut
+export const { handlers, auth, signIn, signOut } = NextAuth({
+  adapter: {
+    ...adapter,
+    // Intercepte la création OAuth pour extraire firstname/lastname depuis name
+    createUser: (user) => {
+      const [firstname, ...rest] = (user.name ?? "").split(" ");
+      const lastname = rest.join(" ");
+      return adapter.createUser!({
+        ...user,
+        // name garde la valeur complète envoyée par Google/GitHub
+        name: user.name ?? "",
+        firstname,
+        lastname,
+      });
+    },
+  } as Adapter,
+
   session: { strategy: "jwt" },
 
   providers: [
@@ -31,17 +45,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        // Cherche l'utilisateur en base par email
         const user = await prisma.user.findUnique({
           where: { email: credentials.email as string },
         });
 
         if (!user || !user.password) return null;
 
-        // Compare le mot de passe fourni avec le hash en base
         const isValid = await bcrypt.compare(
           credentials.password as string,
-          user.password
+          user.password,
         );
 
         if (!isValid) return null;
@@ -53,7 +65,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
   callbacks: {
     async jwt({ token, user }) {
-      // Au premier login, on enrichit le token avec les infos user
       if (user) {
         token.id = user.id;
         token.firstname = user.firstname;
@@ -63,7 +74,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
 
     async session({ session, token }) {
-      // On expose les infos du token dans la session côté client
       if (session.user) {
         session.user.id = token.id as string;
         session.user.firstname = token.firstname as string;
@@ -74,7 +84,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
 
   pages: {
-    // Indique à NextAuth d'utiliser notre page login custom
     signIn: "/login",
   },
 });

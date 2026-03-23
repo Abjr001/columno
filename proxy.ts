@@ -14,11 +14,13 @@ export default auth((req) => {
 
   // Si connecté et sur la page login → redirige vers l'app
   if (isLoggedIn && isAuthPage) {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
+    return NextResponse.redirect(new URL("/app", req.url));
   }
 });
 
 export const config = {
   // Protège toutes les routes sauf les assets statiques et l'api auth
-  matcher: ["/((?!api/auth|_next/static|_next/image|favicon.ico|landing).*)"],
+  matcher: [
+    "/((?!api/auth|_next/static|_next/image|favicon.ico|landing|register).*)",
+  ],
 };

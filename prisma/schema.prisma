@@ -20,6 +20,7 @@ model User {
 
   accounts      Account[]
   sessions      Session[]
+  workspace Workspace?
 }
 
 model Account {
@@ -56,4 +57,27 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+
+model Workspace {
+  id        String    @id @default(cuid())
+  name      String
+  userId    String    @unique  // 1 user = 1 workspace pour le MVP
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projects  Project[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Project {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([workspaceId, name])
 }

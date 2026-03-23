@@ -1,8 +1,15 @@
-import Link from "next/link";
+"use client";
+
 import Image from "next/image";
 import Logo from "@/public/assets/black-log-rmbg.png";
 
-export default function NotFound() {
+export default function Error({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
   return (
     <div className="min-h-screen bg-app-background flex items-center justify-center px-4">
       <div className="w-full max-w-md text-center">
@@ -12,22 +19,22 @@ export default function NotFound() {
 
         <div className="bg-app-surface border border-app-border rounded-2xl p-8 space-y-6 shadow-sm">
           <div className="space-y-2">
-            {/* Gros 404 sobre */}
-            <p className="text-8xl font-bold text-app-border">404</p>
+            <p className="text-6xl">⚠️</p>
             <h1 className="text-app-text text-2xl font-semibold">
-              Page introuvable
+              Une erreur est survenue
             </h1>
             <p className="text-app-text-muted text-sm">
-              La page que tu cherches n&apos;existe pas ou a été déplacée.
+              {error.message || "Quelque chose s'est mal passé. Réessaie."}
             </p>
           </div>
 
-          <Link
-            href="/"
-            className="inline-block w-full bg-primary hover:bg-primary-hover text-white font-medium py-2.5 rounded-lg transition text-sm"
+          {/* reset() recharge le segment qui a échoué sans recharger toute la page */}
+          <button
+            onClick={reset}
+            className="w-full bg-primary hover:bg-primary-hover text-white font-medium py-2.5 rounded-lg transition text-sm cursor-pointer"
           >
-            Retour à l&apos;accueil
-          </Link>
+            Réessayer
+          </button>
         </div>
       </div>
     </div>

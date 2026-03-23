@@ -9,11 +9,16 @@ export async function register(formData: FormData) {
   const lastname = formData.get("lastname") as string;
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
+  const confirmPassword = formData.get("confirmPassword") as string;
 
   // Vérifie si l'email est déjà utilisé
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
-    return { error: "Cet email est déjà utilisé." };
+    throw new Error("Cet email est déjà utilisé.");
+  }
+
+  if (password !== confirmPassword) {
+    throw new Error("Les mots de passe ne correspondent pas.");
   }
 
   // Hash le mot de passe avant de stocker en base
@@ -34,6 +39,6 @@ export async function register(formData: FormData) {
   await signIn("credentials", {
     email,
     password,
-    redirectTo: "/dashboard",
+    redirectTo: "/app",
   });
 }

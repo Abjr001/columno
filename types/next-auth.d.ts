@@ -15,3 +15,10 @@ declare module "next-auth" {
     lastname: string;
   }
 }
+
+declare module "@auth/core/adapters" {
+  interface AdapterUser {
+    firstname: string;
+    lastname: string;
+  }
+}
